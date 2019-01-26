@@ -1,0 +1,15 @@
+.Footer {
+    width: 98%;
+    padding: 1%;
+    background-color: cadetblue;
+    color:white;
+    left: 0;
+    bottom: 0;
+    height: 20px;
+    position: fixed;
+    text-align: center;
+}
+
+.Footer h3 {
+    margin:0;
+}
