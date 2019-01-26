@@ -1,7 +1,7 @@
 .Header {
-    width: 98%;
+    width: 96%;
     height: 25px;
-    padding: 1%;
+    padding: 2%;
     background-color: cadetblue;
     color:white;
     display: inline-block;
@@ -9,7 +9,8 @@
 
 .Title {
     margin:0;
-    width:90%;
+    width:80%;
+    padding-left:10%;
     float:right;
 }
 

@@ -1,0 +1,19 @@
+.Button {
+    background-color: cadetblue;
+    border: none;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font: inherit;
+    padding: 10px;
+    margin: 10px;
+    font-weight: bold;
+}
+
+
+
+.Button:active,
+.Button:focus {
+    color: rgb(245, 217, 175);
+    cursor:pointer;
+}

@@ -1,5 +1,6 @@
 import React,{Component} from 'react';
 import {Line} from 'react-chartjs-2';
+import Button from '../../components/Button/Button';
 
 
 class ChartArea extends Component {
@@ -29,11 +30,15 @@ class ChartArea extends Component {
                 data: [65, 59, 80, 81, 56, 55, 40]
               }
             ]
-          }
+          },
+          active:true
     }
     render(){
         return(
             <div>
+                    <Button>Daily</Button>
+                    <Button>Weekly</Button>
+                    <Button>Monthly</Button>
                 <Line data={this.state.data} />  
             </div>
         )
