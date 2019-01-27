@@ -1,0 +1,15 @@
+.InputBar {
+    width:100%;
+    text-align: center;
+}
+
+.Input {
+    background-color: white;
+    color: cadetblue;
+    border-radius: 5px;
+    cursor: pointer;
+    font: inherit;
+    padding: 10px;
+    margin: 10px;
+    font-weight: bold;
+}
