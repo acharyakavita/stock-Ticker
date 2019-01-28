@@ -1,0 +1,21 @@
+.ChartArea {
+    width:50%;
+    height:500px;
+    margin-left: 10%;
+    text-align: left;
+}
+
+@media only screen and (max-width:600px){
+    .ChartArea{
+        width:100%;
+        margin:0;
+        height: 290px;
+    }
+}
+
+@media only screen and (min-width:601px) and (max-width:800px){
+    .ChartArea{
+        width:80%;
+        height: 400px;
+    }
+}

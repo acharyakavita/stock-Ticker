@@ -17,3 +17,11 @@
     color: rgb(245, 217, 175);
     cursor:pointer;
 }
+
+@media only screen and (max-width:600px){
+    .Button
+    {
+    padding: 5px;
+    margin :10px
+    }
+}

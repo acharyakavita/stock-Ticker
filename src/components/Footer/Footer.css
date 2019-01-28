@@ -1,4 +1,5 @@
 .Footer {
+    margin-top:10%;
     width: 98%;
     padding: 1%;
     background-color: cadetblue;
@@ -6,8 +7,8 @@
     left: 0;
     bottom: 0;
     height: 20px;
-    position: fixed;
     text-align: center;
+    position: fixed;
 }
 
 .Footer h3 {

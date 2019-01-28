@@ -7,8 +7,12 @@ const input = props => {
   return (
     <Aux>
       <form className={classes.InputBar}>
-        <input type="text" placeholder="Enter Stock code.." name="search" tabIndex="0" autoFocus className={classes.Input}/>
+        <input type="text" placeholder="Search your stock.." name="search" tabIndex="0" autoFocus 
+        className={classes.Input}
+        onChange={props.search}
+        value={props.value}/>
         <Button>{<i className="fa fa-search" />}</Button>
+        <Button>Today</Button>
         <Button>Daily</Button>
         <Button>Weekly</Button>
         <Button>Monthly</Button>

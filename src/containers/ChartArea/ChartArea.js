@@ -1,8 +1,11 @@
 import React, { Component } from "react";
 import { Line } from "react-chartjs-2";
 import InputBar from "../../components/Input/InputBar";
+import Classes from "./ChartArea.css";
+import axios from 'axios';
 
 class ChartArea extends Component {
+
   state = {
     data: {
       labels: ["January", "February", "March", "April", "May", "June", "July"],
@@ -30,13 +33,39 @@ class ChartArea extends Component {
         }
       ]
     },
-    active: true
+    symbol:'',
+    showResults:false
   };
+
+  searchCompanyHandler(event){
+    this.setState({symbol:event.target.value})
+    axios.get('https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords='+this.state.symbol+'&apikey=4MT47F64XCP0A03M')
+    .then(res=>{
+        console.log(res)
+        this.setState({showResults:true})
+        this.displaySearchResults(res);
+    })
+    .catch(err=>{
+        console.log(err)
+        this.setState({showResults:false})
+    })
+  }
+  
+  displaySearchResults(res){
+    return true;
+  }
+
+
   render() {
     return (
-      <div>
-        <InputBar/>
-        <Line data={this.state.data} />
+      <div className={Classes.ChartArea}>
+        <InputBar search={(event)=>this.searchCompanyHandler(event)} value={this.state.symbol} show={this.state.showResults}/>
+        <Line
+          data={this.state.data}
+          options={{
+            maintainAspectRatio: false
+          }}
+        />
       </div>
     );
   }
