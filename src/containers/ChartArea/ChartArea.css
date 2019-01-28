@@ -1,9 +1,11 @@
 .ChartArea {
-    width:50%;
+    width:60%;
     height:500px;
     margin-left: 10%;
     text-align: left;
+    position: relative;
 }
+
 
 @media only screen and (max-width:600px){
     .ChartArea{

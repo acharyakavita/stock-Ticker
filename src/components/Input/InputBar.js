@@ -1,30 +1,54 @@
 import React from "react";
 import classes from "./InputBar.css";
-import Aux from "../../hoc/Auxilary";
 import Button from "../Button/Button";
 
 const input = props => {
-    if(props.showResults){
-        
-    }
+  let searchResults = null;
+  let searchResultsItem = null;
+  if (props.show) {
+      /*show first 5 results*/
+    searchResultsItem = props.searchResults.map(item => {
+        let companyKey=item.companySymbol+item.companyRegion
+      return (
+        <li key={companyKey} 
+        className={classes.SearchResultsContent}
+         onClick={()=>props.companyCodeClick(item.companySymbol)}>
+            {item.companySymbol} : {item.companyName},
+            {item.companyRegion}
+         </li>
+      );
+    })
+    searchResults = (
+      <ul className={classes.SearchResults}>{searchResultsItem}</ul>
+    );
+  }
+
   return (
-    <Aux>
-      <form className={classes.InputBar}>
-        <input type="text" placeholder="Search your stock.." name="search" tabIndex="0" autoFocus 
-        autoComplete="off"
-        className={classes.Input}
-        onChange={props.search}
-        value={props.value}/>
-        <ul id="myUL">
-  <li>{props.companyName[0]}{props.companySymbol[0]}</li>
-</ul>
-        <Button>{<i className="fa fa-search" />}</Button>
+    <div className={classes.InputBar}>
+      <form className={classes.Form}>
+        <input
+          type="text"
+          placeholder="Search your stock.."
+          name="search"
+          tabIndex="0"
+          autoFocus
+          autoComplete="off"
+          className={classes.Input}
+          onChange={props.search}
+          value={props.value}
+        />
+        <Button style={{ marginBottom: "0" }}>
+          {<i className="fa fa-search" />}
+        </Button>
+        {searchResults}
+      </form>
+      <div className={classes.ButtonGroup}>
         <Button>Today</Button>
         <Button>Daily</Button>
         <Button>Weekly</Button>
         <Button>Monthly</Button>
-      </form>
-    </Aux>
+      </div>
+    </div>
   );
 };
 

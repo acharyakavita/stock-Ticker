@@ -1,6 +1,17 @@
 .InputBar {
-    width:100%;
+    width:97%;
     padding-left:3%;
+    display: flex;
+}
+
+.Form {
+    width:50%;
+    position: relative;
+}
+
+.ButtonGroup {
+    text-align: center;
+    width:50%;
 }
 
 .Input {
@@ -10,27 +21,46 @@
     cursor: pointer;
     font: inherit;
     padding: 10px;
-    margin: 10px 0 10px 10px;
+    margin: 10px 0 0 10px;
     font-weight: bold;
+    width:70%
 }
 
- .Search-results {
-    position: relative;
-    display: inline-block;
+ .SearchResults {
+    width:100%;
+    position: absolute;
+    list-style-type: none;
+    margin: 0 10px 10px;
+    z-index: 1;
+    font-weight: bold;
+    cursor: pointer;
+    color: cadetblue;
+    border-radius: 5px;
+    border: solid grey 1px;
+  }
+
+ul {
+      margin:0;
+      padding: 0;
   }
   
-  .Search-results-content {
- 
-    position: absolute;
+  .SearchResultsContent {
+    padding:3px;
     background-color: white;
-    min-width: 230px;
-    overflow: auto;
-    border: 1px solid #ddd;
-    z-index: 1;
+    border: 1px solid grey;
     color: cadetblue;
   }
 
-  .show {
-      display: block;
+@media only screen and (max-width:800px){
+    .InputBar {
+        display: block;
     }
-  
+    
+    .Form {
+        width:100%;
+    }
+    
+    .ButtonGroup {
+        width:100%;
+    }
+}

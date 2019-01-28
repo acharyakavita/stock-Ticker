@@ -34,8 +34,12 @@ class ChartArea extends Component {
     },
     searchInput: "",
     showResults: false,
-    companySymbol: [],
-    companyName: []
+    searchData:[{
+        companySymbol:' ',  
+        companyName:' ',
+        companyRegion:' '
+    }]
+ 
   };
 
   searchCompanyHandler(event) {
@@ -47,7 +51,10 @@ class ChartArea extends Component {
           "&apikey=4MT47F64XCP0A03M"
       )
       .then(res => {
-        this.storeSearchCompanyNameResults(res.data.bestMatches);
+        if(res.data.bestMatches){
+            this.storeSearchCompanyNameResults(res.data.bestMatches);
+        }
+        
       })
       .catch(err => {
         console.log(err);
@@ -57,17 +64,26 @@ class ChartArea extends Component {
 
   /*stores the api results for company names and symbols*/
   storeSearchCompanyNameResults(response) {
-    let newCompanySymbols = [];
-    let newCompanyNames = [];
-    for (let item = 0; item < 4; item++) {
-      newCompanySymbols[item] = response[item]["1. symbol"];
-      newCompanyNames[item] = response[item]["2. name"];
-    }
+    let updatedSearchData=[{companySymbol:' ',companyName:' ',companyRegion:' '}];
+
+    updatedSearchData=response.splice(0,5).map(item=>({
+        companySymbol :item["1. symbol"],
+        companyName:item["2. name"],
+        companyRegion:item['4. region']
+    }))
     this.setState({
-      companyName: newCompanyNames,
-      companySymbol: newCompanySymbols,
+      searchData:[...updatedSearchData],
       showResults: true
     });
+
+  }
+
+  companyCodeClickHandler=symbol=>{
+
+    this.setState({
+        searchInput:symbol,
+        showResults: false
+    })
   }
 
   render() {
@@ -75,10 +91,10 @@ class ChartArea extends Component {
       <div className={Classes.ChartArea}>
         <InputBar
           search={event => this.searchCompanyHandler(event)}
-          value={this.state.symbol}
+          value={this.state.searchInput}
           show={this.state.showResults}
-          companyName={this.state.companyName}
-          companySymbol={this.state.companySymbol}
+          searchResults={this.state.searchData}
+          companyCodeClick={this.companyCodeClickHandler}
         />
         <Line
           data={this.state.data}
