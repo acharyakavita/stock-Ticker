@@ -94,13 +94,17 @@ class ChartArea extends Component {
     return (number < 10 ? "0" : "") + number;
   }
 
+  searchButtonClickHandler=(event)=>{
+    event.preventDefault();
+    this.todayButtonClickHandler();
+  }
   /*Current day ApI*/
   todayButtonClickHandler = () => {
     axios
       .get(
         "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=" +
           this.state.searchInput +
-          "&interval=5min&outputsize=compact&apikey=4MT47F64XCP0A03M"
+          "&interval=15min&outputsize=compact&apikey=4MT47F64XCP0A03M"
       )
       .then(res => {
         let timeIntervalLabel = [];
@@ -111,11 +115,11 @@ class ChartArea extends Component {
           new Date().getMonth() + 1
         )}-${this.pad(new Date().getDate())}`;
 
-        for (let dateObj in res.data["Time Series (5min)"]) {
+        for (let dateObj in res.data["Time Series (15min)"]) {
           if (dateObj.startsWith(currentDate)) {
             timeIntervalLabel.push(dateObj);
             closingPrice.push(
-              Number(res.data["Time Series (5min)"][dateObj]["4. close"])
+              Number(res.data["Time Series (15min)"][dateObj]["4. close"])
             );
           }
         }
@@ -134,8 +138,7 @@ class ChartArea extends Component {
       });
   };
 
-  searchButtonClickHandler = event => {
-    event.preventDefault();
+  dailyButtonClickHandler = () => {
     axios
       .get(
         "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" +
@@ -166,6 +169,42 @@ class ChartArea extends Component {
         newData.labels = StringDaysLabel;
         newData.datasets[0].data = dailyClosingPrice.reverse(); /*.splice(95,5);*/
         this.setState({ data: newData, Xlabel: "Days",unit:'day' });
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+
+
+  weeklyButtonClickHandler = event => {
+    event.preventDefault();
+    axios
+      .get(
+          'https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol='+
+          this.state.searchInput +'&apikey=4MT47F64XCP0A03M'
+      )
+      .then(res => {
+        let weeklyLabel = [];
+        let stringWeeklyLabel = [];
+        let weeklyClosingPrice = [];
+
+        /*save the labels*/
+        weeklyLabel = Object.keys(res.data["Weekly Time Series"]).reverse(); /*.splice(95,5);*/
+        stringWeeklyLabel = weeklyLabel.map(date =>
+          Moment(date, "YYYY-MM-DD").format("YYYY-MM-DD")
+        );
+
+        /*save the prices*/
+        for (let week in res.data["Weekly Time Series"]) {
+          weeklyClosingPrice.push(
+            Number(res.data["Weekly Time Series"][week]["4. close"])
+          );
+        }
+
+        let newData = { ...this.state.data };
+        newData.labels = stringWeeklyLabel;
+        newData.datasets[0].data = weeklyClosingPrice.reverse(); /*.splice(95,5);*/
+        this.setState({ data: newData, Xlabel: "Week Ending",unit:'month' });
       })
       .catch(err => {
         console.log(err);
@@ -230,7 +269,9 @@ class ChartArea extends Component {
           companyCodeClick={this.companyCodeClickHandler}
           todayButtonClick={this.todayButtonClickHandler}
           searchButtonClick={this.searchButtonClickHandler}
+          dailyButtonClick={this.dailyButtonClickHandler}
           weeklyButtonClick={this.weeklyButtonClickHandler}
+          monthlyButtonClick={this.monthlyButtonClickHandler}
         />
         <Line data={this.state.data} options={options} />
       </div>
