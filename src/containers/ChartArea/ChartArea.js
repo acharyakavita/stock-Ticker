@@ -3,16 +3,16 @@ import { Line } from "react-chartjs-2";
 import InputBar from "../../components/Input/InputBar";
 import Classes from "./ChartArea.css";
 import axios from "axios";
-
+import Moment from 'moment'
 class ChartArea extends Component {
   state = {
     data: {
-      labels: ["January", "February", "March", "April", "May", "June", "July"],
+      labels: [],
       datasets: [
         {
-          label: "My First dataset",
+          label: "Stock Price",
           fill: false,
-          lineTension: 0.1,
+          lineTension: 0,
           backgroundColor: "rgba(75,192,192,0.4)",
           borderColor: "rgba(75,192,192,1)",
           borderCapStyle: "butt",
@@ -28,20 +28,23 @@ class ChartArea extends Component {
           pointHoverBorderWidth: 2,
           pointRadius: 1,
           pointHitRadius: 10,
-          data: [65, 59, 80, 81, 56, 55, 40]
+          data: []
         }
       ]
     },
     searchInput: "",
     showResults: false,
-    searchData:[{
-        companySymbol:' ',  
-        companyName:' ',
-        companyRegion:' '
-    }]
- 
+    searchData: [
+      {
+        companySymbol: " ",
+        companyName: " ",
+        companyRegion: " "
+      }
+    ],
+    Xlabel: ""
   };
 
+  /*search company codes Api call*/
   searchCompanyHandler(event) {
     this.setState({ searchInput: event.target.value });
     axios
@@ -51,10 +54,9 @@ class ChartArea extends Component {
           "&apikey=4MT47F64XCP0A03M"
       )
       .then(res => {
-        if(res.data.bestMatches){
-            this.storeSearchCompanyNameResults(res.data.bestMatches);
+        if (res.data.bestMatches) {
+          this.storeSearchCompanyNameResults(res.data.bestMatches);
         }
-        
       })
       .catch(err => {
         console.log(err);
@@ -64,27 +66,67 @@ class ChartArea extends Component {
 
   /*stores the api results for company names and symbols*/
   storeSearchCompanyNameResults(response) {
-    let updatedSearchData=[{companySymbol:' ',companyName:' ',companyRegion:' '}];
+    let updatedSearchData = [
+      { companySymbol: " ", companyName: " ", companyRegion: " " }
+    ];
 
-    updatedSearchData=response.splice(0,5).map(item=>({
-        companySymbol :item["1. symbol"],
-        companyName:item["2. name"],
-        companyRegion:item['4. region']
-    }))
+    updatedSearchData = response.splice(0, 5).map(item => ({
+      companySymbol: item["1. symbol"],
+      companyName: item["2. name"],
+      companyRegion: item["4. region"]
+    }));
     this.setState({
-      searchData:[...updatedSearchData],
+      searchData: [...updatedSearchData],
       showResults: true
     });
-
   }
 
-  companyCodeClickHandler=symbol=>{
-
+  /*sets the symbol in the input bar*/
+  companyCodeClickHandler = symbol => {
     this.setState({
-        searchInput:symbol,
-        showResults: false
-    })
-  }
+      searchInput: symbol,
+      showResults: false
+    });
+  };
+
+  searchButtonClickHandler = event => {
+    event.preventDefault();
+    axios
+      .get(
+        "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" +
+          this.state.searchInput +
+          "&outputsize=compact&apikey=4MT47F64XCP0A03M"
+      )
+      .then(res => {
+        let daysLabel = [];
+        let StringDaysLabel=[];
+        let dailyClosingPrice = [];
+        console.log(res)
+        /*save the labels*/
+        daysLabel=Object.keys(res.data["Time Series (Daily)"]).reverse().splice(95,5);
+        //for(let day=0;day<daysLabel.length;day++){
+        //    StringDaysLabel.push(Moment(daysLabel[day],'YYYY-MM-DD').format('MMMM DD, YYYY'))
+       // }
+       StringDaysLabel=daysLabel.map(date=>Moment(date,'YYYY-MM-DD').format('MMMM DD, YYYY'));
+
+        /*save the prices*/
+        for (let day in res.data["Time Series (Daily)"]) {
+          dailyClosingPrice.push(
+            Number(res.data["Time Series (Daily)"][day]["4. close"])
+          );
+        }
+
+       let newData = { ...this.state.data };
+
+       newData.labels = StringDaysLabel;
+        newData.datasets[0].data = dailyClosingPrice.reverse().splice(95,5);
+        this.setState({ data: newData, Xlabel: "Days" });
+        console.log(this.state.data);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
 
   render() {
     return (
@@ -95,11 +137,53 @@ class ChartArea extends Component {
           show={this.state.showResults}
           searchResults={this.state.searchData}
           companyCodeClick={this.companyCodeClickHandler}
+          searchButtonClick={this.searchButtonClickHandler}
         />
         <Line
           data={this.state.data}
           options={{
-            maintainAspectRatio: false
+            maintainAspectRatio: false,
+            responsive: true,
+            legend: {
+              display: false
+            },
+            tooltips: {
+                mode: 'index',
+                intersect: false,
+            },
+            hover: {
+                mode: 'nearest',
+                intersect: true
+            },
+            scales: {
+              xAxes: [{
+                  display: true,
+                  type: 'time',
+                  distribution: 'linear',
+                  time: {
+                    unit: 'day',
+                    displayFormats: {
+                      day: 'MMM D'
+                    },
+                    ticks:{
+                        source:'labels'
+                    }},
+                  scaleLabel: {
+                    labelString: this.state.Xlabel,
+                    fontSize: 20
+                  }
+                }
+              ],
+              yAxes: [{
+                display: true,
+                  scaleLabel: {
+                    display: true,
+                    labelString: "Price in USD",
+                    fontSize: 10
+                  }
+                }
+              ]
+            }
           }}
         />
       </div>

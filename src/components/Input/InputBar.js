@@ -37,7 +37,8 @@ const input = props => {
           onChange={props.search}
           value={props.value}
         />
-        <Button style={{ marginBottom: "0" }}>
+        <Button style={{ marginBottom: "0" }}
+        clicked={props.searchButtonClick}>
           {<i className="fa fa-search" />}
         </Button>
         {searchResults}

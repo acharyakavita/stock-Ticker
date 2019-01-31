@@ -6,7 +6,13 @@
     position: relative;
 }
 
+.Xlabel{
+    margin-top:2%;
+}
 
+.Ylabel{
+    margin-right:2%;
+}
 @media only screen and (max-width:600px){
     .ChartArea{
         width:100%;
