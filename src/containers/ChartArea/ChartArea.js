@@ -3,7 +3,7 @@ import { Line } from "react-chartjs-2";
 import InputBar from "../../components/Input/InputBar";
 import Classes from "./ChartArea.css";
 import axios from "axios";
-import Moment from 'moment'
+import Moment from "moment";
 class ChartArea extends Component {
   state = {
     data: {
@@ -41,7 +41,8 @@ class ChartArea extends Component {
         companyRegion: " "
       }
     ],
-    Xlabel: ""
+    Xlabel: "",
+    unit:''
   };
 
   /*search company codes Api call*/
@@ -89,6 +90,50 @@ class ChartArea extends Component {
     });
   };
 
+  pad(number) {
+    return (number < 10 ? "0" : "") + number;
+  }
+
+  /*Current day ApI*/
+  todayButtonClickHandler = () => {
+    axios
+      .get(
+        "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=" +
+          this.state.searchInput +
+          "&interval=5min&outputsize=compact&apikey=4MT47F64XCP0A03M"
+      )
+      .then(res => {
+        let timeIntervalLabel = [];
+        let stringTimeIntervalLabel = [];
+        let closingPrice = [];
+        /*getting current date in YYYY-MM-DD format*/
+        let currentDate = `${new Date().getFullYear()}-${this.pad(
+          new Date().getMonth() + 1
+        )}-${this.pad(new Date().getDate())}`;
+
+        for (let dateObj in res.data["Time Series (5min)"]) {
+          if (dateObj.startsWith(currentDate)) {
+            timeIntervalLabel.push(dateObj);
+            closingPrice.push(
+              Number(res.data["Time Series (5min)"][dateObj]["4. close"])
+            );
+          }
+        }
+
+        stringTimeIntervalLabel = timeIntervalLabel.map(date =>
+          Moment(date,'YYYY-MM-DD hh:mm:ss').format()
+        );
+
+        let newData = { ...this.state.data };
+        newData.labels = stringTimeIntervalLabel.reverse();
+        newData.datasets[0].data = closingPrice.reverse();
+        this.setState({ data: newData, Xlabel: "Time",unit:'hour' });
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+
   searchButtonClickHandler = event => {
     event.preventDefault();
     axios
@@ -99,15 +144,16 @@ class ChartArea extends Component {
       )
       .then(res => {
         let daysLabel = [];
-        let StringDaysLabel=[];
+        let StringDaysLabel = [];
         let dailyClosingPrice = [];
-        console.log(res)
+
         /*save the labels*/
-        daysLabel=Object.keys(res.data["Time Series (Daily)"]).reverse().splice(95,5);
-        //for(let day=0;day<daysLabel.length;day++){
-        //    StringDaysLabel.push(Moment(daysLabel[day],'YYYY-MM-DD').format('MMMM DD, YYYY'))
-       // }
-       StringDaysLabel=daysLabel.map(date=>Moment(date,'YYYY-MM-DD').format('MMMM DD, YYYY'));
+        daysLabel = Object.keys(
+          res.data["Time Series (Daily)"]
+        ).reverse(); /*.splice(95,5);*/
+        StringDaysLabel = daysLabel.map(date =>
+          Moment(date, "YYYY-MM-DD").format("YYYY-MM-DD")
+        );
 
         /*save the prices*/
         for (let day in res.data["Time Series (Daily)"]) {
@@ -116,12 +162,10 @@ class ChartArea extends Component {
           );
         }
 
-       let newData = { ...this.state.data };
-
-       newData.labels = StringDaysLabel;
-        newData.datasets[0].data = dailyClosingPrice.reverse().splice(95,5);
-        this.setState({ data: newData, Xlabel: "Days" });
-        console.log(this.state.data);
+        let newData = { ...this.state.data };
+        newData.labels = StringDaysLabel;
+        newData.datasets[0].data = dailyClosingPrice.reverse(); /*.splice(95,5);*/
+        this.setState({ data: newData, Xlabel: "Days",unit:'day' });
       })
       .catch(err => {
         console.log(err);
@@ -129,6 +173,53 @@ class ChartArea extends Component {
   };
 
   render() {
+    const options = {
+      maintainAspectRatio: false,
+      responsive: true,
+      legend: {
+        display: false
+      },
+      tooltips: {
+        mode: "index",
+        intersect: false
+      },
+      hover: {
+        mode: "nearest",
+        intersect: true
+      },
+      scales: {
+        xAxes: [
+          {
+            display: true,
+            type: "time",
+            distribution: "linear",
+            time: {
+              unit: this.state.unit,
+              ticks: {
+                source: "labels"
+              }
+            },
+            scaleLabel: {
+              labelString: this.state.Xlabel,
+              fontSize: 20
+            }
+          }
+        ],
+        yAxes: [
+          {
+            display: true,
+            scaleLabel: {
+              display: true,
+              labelString: "Price in USD",
+              fontSize: 10
+            },
+            ticks: {
+              beginAtZero: true,
+            }
+          }
+        ]
+      }
+    };
     return (
       <div className={Classes.ChartArea}>
         <InputBar
@@ -137,55 +228,11 @@ class ChartArea extends Component {
           show={this.state.showResults}
           searchResults={this.state.searchData}
           companyCodeClick={this.companyCodeClickHandler}
+          todayButtonClick={this.todayButtonClickHandler}
           searchButtonClick={this.searchButtonClickHandler}
+          weeklyButtonClick={this.weeklyButtonClickHandler}
         />
-        <Line
-          data={this.state.data}
-          options={{
-            maintainAspectRatio: false,
-            responsive: true,
-            legend: {
-              display: false
-            },
-            tooltips: {
-                mode: 'index',
-                intersect: false,
-            },
-            hover: {
-                mode: 'nearest',
-                intersect: true
-            },
-            scales: {
-              xAxes: [{
-                  display: true,
-                  type: 'time',
-                  distribution: 'linear',
-                  time: {
-                    unit: 'day',
-                    displayFormats: {
-                      day: 'MMM D'
-                    },
-                    ticks:{
-                        source:'labels'
-                    }},
-                  scaleLabel: {
-                    labelString: this.state.Xlabel,
-                    fontSize: 20
-                  }
-                }
-              ],
-              yAxes: [{
-                display: true,
-                  scaleLabel: {
-                    display: true,
-                    labelString: "Price in USD",
-                    fontSize: 10
-                  }
-                }
-              ]
-            }
-          }}
-        />
+        <Line data={this.state.data} options={options} />
       </div>
     );
   }
