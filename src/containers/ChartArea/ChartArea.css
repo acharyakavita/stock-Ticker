@@ -1,6 +1,6 @@
 .ChartArea {
     width:60%;
-    height:500px;
+    height:450px;
     margin-left: 10%;
     text-align: left;
     position: relative;
@@ -12,6 +12,11 @@
 
 .Ylabel{
     margin-right:2%;
+}
+
+.Error{
+    padding-left:3%;
+    color:red;
 }
 @media only screen and (max-width:600px){
     .ChartArea{
