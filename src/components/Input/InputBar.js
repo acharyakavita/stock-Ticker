@@ -44,9 +44,9 @@ const input = props => {
         {searchResults}
       </form>
       <div className={classes.ButtonGroup}>
-        <Button clicked={props.dailyButtonClick}>Daily</Button>
-        <Button clicked={props.weeklyButtonClick}>Weekly</Button>
-        <Button clicked={props.monthlyButtonClick}>Monthly</Button>
+        <Button disabled={props.disable} clicked={props.dailyButtonClick}>Daily</Button>
+        <Button disabled={props.disable} clicked={props.weeklyButtonClick}>Weekly</Button>
+        <Button disabled={props.disable} clicked={props.monthlyButtonClick}>Monthly</Button>
       </div>
     </div>
   );

@@ -53,6 +53,7 @@ class ChartArea extends Component {
       volume: 0,
       close: 0
     },
+    disable:true,
     error: false,
     errorMsg: "",
     delay:
@@ -96,7 +97,8 @@ class ChartArea extends Component {
       searchData: [...updatedSearchData],
       showResults: true,
       beginAtZero: true,
-      delayFlag: false
+      delayFlag: false,
+      disable:true
     });
   }
 
@@ -130,7 +132,7 @@ class ChartArea extends Component {
           newQuote.volume = res.data["Global Quote"]["06. volume"];
           newQuote.close = res.data["Global Quote"]["08. previous close"];
           newQuote.price = res.data["Global Quote"]["05. price"];
-          this.setState({ quote: newQuote, delayFlag: false });
+          this.setState({ quote: newQuote, delayFlag: false,disable:false});
           this.todaysData();
         } else {
           this.setState({ delayFlag: true });
@@ -400,6 +402,7 @@ class ChartArea extends Component {
           dailyButtonClick={this.dailyButtonClickHandler}
           weeklyButtonClick={this.weeklyButtonClickHandler}
           monthlyButtonClick={this.monthlyButtonClickHandler}
+          disable={this.state.disable}
         />
         {data}
         <StockBar quoteData={this.state.quote} />
